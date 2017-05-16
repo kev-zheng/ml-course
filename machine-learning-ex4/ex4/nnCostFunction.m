@@ -73,14 +73,15 @@ y_mat = 1:num_labels == y; % 5000 x 10
 
 % Forward propagation
 a1 = [ones(m, 1) X]; % 5000 x 401
+
 z2 = a1 * Theta1';
 a2 = [ones(m, 1) sigmoid(z2)]; % 5000 x 25 + 1
 z3 = a2 * Theta2';
-hypothesis = sigmoid(z3); % 5000 x 10
+a3 = sigmoid(z3); % 5000 x 10
 
 % Compute cost
 % * Use trace when doing matrix math for double summations * %
-J = 1/m * trace(-y_mat' * log(hypothesis) - (1 - y_mat') * log(1 - hypothesis));
+J = 1/m * trace(-y_mat' * log(a3) - (1 - y_mat') * log(1 - a3));
 
 % Compute Regularized Cost
 
@@ -91,6 +92,7 @@ Theta2_reg = Theta2(:, 2:end);
 J = J + (lambda/(2*m) * (trace(Theta1_reg * Theta1_reg') + ...
                          trace(Theta2_reg * Theta2_reg')));
 
+% Backpropagation
 for t = 1:m
     a1 = [1, X(t, :)]; % Input layer, add bias unit
     z2 = a1 * Theta1';
@@ -107,6 +109,7 @@ for t = 1:m
     Theta1_grad = Theta1_grad + d2' * a1;
     Theta2_grad = Theta2_grad + d3' * a2;
 end
+
 
 Theta1_grad = Theta1_grad * (1/m);
 Theta2_grad = Theta2_grad * (1/m);

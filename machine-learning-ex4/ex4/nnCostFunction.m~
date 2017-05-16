@@ -60,23 +60,30 @@ Theta2_grad = zeros(size(Theta2));
 %               backpropagation. That is, you can compute the gradients for
 %               the regularization separately and then add them to Theta1_grad
 %               and Theta2_grad from Part 2.
+%
+
+% Example var.
+% m 5000
+% X 5000 x 400
+% Theta1 25 x 401
+% Theta2 10x26
 
 % Expand y from digit to index logical vector
-y_mat = 1:num_labels == y; % m x num_labels
+y_mat = 1:num_labels == y; % 5000 x 10
 
 % Forward propagation
-a1 = [ones(m, 1) X]; % m x img_size
-
+a1 = [ones(m, 1) X]; % 5000 x 401
 z2 = a1 * Theta1';
-a2 = [ones(m, 1) sigmoid(z2)]; % m x 1 + hidden layer
+a2 = [ones(m, 1) sigmoid(z2)]; % 5000 x 25 + 1
 z3 = a2 * Theta2';
-a3 = sigmoid(z3); % m x num_labels
+a3 = sigmoid(z3); % 5000 x 10
 
 % Compute cost
 % * Use trace when doing matrix math for double summations * %
-J = 1/m * trace(-y_mat' * log(a3) - (1 - y_mat') * log(1 - a3));
+J = 1/m * trace(-y_mat' * log(hypothesis) - (1 - y_mat') * log(1 - hypothesis));
 
-% Regularize Cost
+% Compute Regularized Cost
+
 % Remove bias unit for regularization
 Theta1_reg = Theta1(:, 2:end);
 Theta2_reg = Theta2(:, 2:end);
@@ -88,8 +95,29 @@ J = J + (lambda/(2*m) * (trace(Theta1_reg * Theta1_reg') + ...
 d3 = a3 - y_mat;
 d2 = d3 * Theta2(:, 2:end) .* sigmoidGradient(z2);
 
-Theta1_grad = d2' * a1 * (1/m);
-Theta2_grad = d3' * a2 * (1/m);
+Theta1_grad
+Theta2_gr
+%{
+for t = 1:m
+    a1 = [1, X(t, :)]; % Input layer, add bias unit
+    z2 = a1 * Theta1';
+
+    a2 = [1, sigmoid(z2)]; % Hidden layer, add bias unit
+    z3 = a2 * Theta2';
+    a3 = sigmoid(z3);
+    
+    d3 = a3 - y_mat(t, :); % Output layer error
+
+    d2 = d3 * Theta2(:, 2:end) .* sigmoidGradient(z2); % Hidden layer error
+    
+    % Accumulate gradient
+    Theta1_grad = Theta1_grad + d2' * a1;
+    Theta2_grad = Theta2_grad + d3' * a2;
+end
+%}
+
+Theta1_grad = Theta1_grad * (1/m);
+Theta2_grad = Theta2_grad * (1/m);
 
 % Regularization
 Theta1_grad(:, 2:end) = Theta1_grad(:, 2:end) + ...
@@ -103,5 +131,6 @@ Theta2_grad(:, 2:end) = Theta2_grad(:, 2:end) + ...
 
 % Unroll gradients
 grad = [Theta1_grad(:) ; Theta2_grad(:)];
+
 
 end
