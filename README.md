@@ -1,2 +1,3 @@
 # ml-course
-My implementations for Andrew Ng's Introduction to Machine Learning on Coursera
+Python and MATLAB implementations for Introduction to Machine Learning on
+Coursera
